@@ -1,9 +1,10 @@
 let x = 5;
 let y = 10;
+let name = "öğrenci";
 let sonuc = x + y;
 
 if (sonuc > 12) {
-    "Büyük";
+    name + " " +"geçti";
 } else {
     "Küçük";
 }
