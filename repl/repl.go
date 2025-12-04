@@ -22,8 +22,7 @@ func Start(in io.Reader, out io.Writer) {
 	fmt.Fprintf(out, "Çıkmak için 'exit' veya Ctrl+C\n\n")
 
 	for {
-		fmt.Fprintf(out, PROMPT)
-
+		fmt.Fprint(out, PROMPT)
 		scanned := scanner.Scan()
 		if !scanned {
 			return
