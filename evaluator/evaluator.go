@@ -2,8 +2,9 @@ package evaluator
 
 import (
 	"fmt"
-	"hajilang/ast"
-	"hajilang/object"
+
+	"github.com/slymanmrcan/hajilang/ast"
+	"github.com/slymanmrcan/hajilang/object"
 )
 
 // --- EKSİK OLAN KISIM 1: GLOBAL TRUE/FALSE ---

@@ -2,9 +2,9 @@ package parser
 
 import (
 	"fmt"
-	"hajilang/ast"
-	"hajilang/lexer"
-	"hajilang/token"
+	"github.com/slymanmrcan/hajilang/ast"
+	"github.com/slymanmrcan/hajilang/lexer"
+	"github.com/slymanmrcan/hajilang/token"
 	"strconv"
 )
 

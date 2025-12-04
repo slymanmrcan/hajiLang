@@ -1,6 +1,6 @@
 package lexer
 
-import "hajilang/token"
+import "github.com/slymanmrcan/hajilang/token"
 
 type Lexer struct {
 	input        string

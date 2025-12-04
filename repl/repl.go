@@ -3,11 +3,12 @@ package repl
 import (
 	"bufio"
 	"fmt"
-	"hajilang/evaluator"
-	"hajilang/lexer"
-	"hajilang/object"
-	"hajilang/parser"
 	"io"
+
+	"github.com/slymanmrcan/hajilang/evaluator"
+	"github.com/slymanmrcan/hajilang/lexer"
+	"github.com/slymanmrcan/hajilang/object"
+	"github.com/slymanmrcan/hajilang/parser"
 )
 
 const PROMPT = "hajı> "

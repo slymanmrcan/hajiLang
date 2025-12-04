@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"hajilang/evaluator" // <--- EKLENDİ
-	"hajilang/lexer"
-	"hajilang/object" // <--- EKLENDİ
-	"hajilang/parser"
-	"hajilang/repl"
 	"os"
+
+	"github.com/slymanmrcan/hajilang/evaluator"
+	"github.com/slymanmrcan/hajilang/lexer"
+	"github.com/slymanmrcan/hajilang/object" // <--- EKLENDİ
+	"github.com/slymanmrcan/hajilang/parser"
+	"github.com/slymanmrcan/hajilang/repl"
 )
 
 func main() {

@@ -2,7 +2,8 @@ package ast
 
 import (
 	"bytes"
-	"hajilang/token"
+
+	"github.com/slymanmrcan/hajilang/token"
 )
 
 // --- TEMEL YAPILAR ---
