@@ -1,0 +1,34 @@
+# Binary dosyalar (derlenmişler)
+hajilang
+*.exe
+*.out
+
+# Go build dosyaları
+*.o
+*.a
+*.so
+
+# Test coverage
+*.out
+coverage.html
+
+# Vendor klasörü (eğer kullanırsan)
+vendor/
+
+# IDE ayarları
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS dosyaları
+.DS_Store
+
+# Test çıktıları
+*.test
+*.prof
+
+# Geçici dosyalar
+tmp/
+temp/
