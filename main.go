@@ -6,12 +6,18 @@ import (
 	"hajilang/lexer"
 	"hajilang/object" // <--- EKLENDİ
 	"hajilang/parser"
+	"hajilang/repl"
 	"os"
 )
 
 func main() {
+	if len(os.Args) == 1 {
+		repl.Start(os.Stdin, os.Stdout)
+		return
+	}
 	if len(os.Args) < 2 {
 		fmt.Println("Kullanım: ./hajilang dosya.haji")
+		fmt.Println("  veya   hajilang (REPL için)")
 		return
 	}
 
@@ -46,16 +52,17 @@ func main() {
 
 	// A) Hafızayı oluştur (RAM'i tak)
 	env := object.NewEnvironment()
+	verbose := false // veya flag ile al
 
 	// B) Kodları sırayla çalıştır
-	for _, stmt := range program.Statements {
-		// Hafızayı (env) da gönderiyoruz artık!
+	for i, stmt := range program.Statements {
 		sonuc := evaluator.Eval(stmt, env)
 
 		if sonuc != nil {
-			fmt.Println("SONUÇ >", sonuc.Inspect())
+			// Son satır veya verbose modda göster
+			if verbose || i == len(program.Statements)-1 {
+				fmt.Println(sonuc.Inspect())
+			}
 		}
 	}
-
-	fmt.Println("--------------------------------------------")
 }
