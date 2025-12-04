@@ -11,7 +11,7 @@ import (
 	"github.com/slymanmrcan/hajilang/parser"
 )
 
-const PROMPT = "hajı> "
+const PROMPT = "haji> "
 
 // Start başlatır REPL oturumunu
 func Start(in io.Reader, out io.Writer) {
@@ -33,7 +33,7 @@ func Start(in io.Reader, out io.Writer) {
 
 		// Exit komutu
 		if line == "exit" || line == "çık" {
-			fmt.Fprintf(out, "Görüşürüz hajı!\n")
+			fmt.Fprintf(out, "Görüşürüz haji!\n")
 			return
 		}
 
@@ -62,7 +62,7 @@ func Start(in io.Reader, out io.Writer) {
 }
 
 func printParserErrors(out io.Writer, errors []string) {
-	fmt.Fprintf(out, "Hata hajı!\n")
+	fmt.Fprintf(out, "Hata haji!\n")
 	for _, msg := range errors {
 		fmt.Fprintf(out, "  %s\n", msg)
 	}
