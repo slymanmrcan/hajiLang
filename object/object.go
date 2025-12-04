@@ -8,6 +8,8 @@ type ObjectType string
 const (
 	INTEGER_OBJ = "INTEGER"
 	ERROR_OBJ   = "ERROR"
+	STRING_OBJ  = "STRING"
+	BOOLEAN_OBJ = "BOOLEAN"
 )
 
 type Object interface {
@@ -31,12 +33,16 @@ type Error struct {
 func (e *Error) Type() ObjectType { return ERROR_OBJ }
 func (e *Error) Inspect() string  { return "HATA: " + e.Message }
 
-// --- BOOLEAN EKLEME ---
-const BOOLEAN_OBJ = "BOOLEAN"
-
 type Boolean struct {
 	Value bool
 }
 
 func (b *Boolean) Type() ObjectType { return BOOLEAN_OBJ }
 func (b *Boolean) Inspect() string  { return fmt.Sprintf("%t", b.Value) }
+
+type String struct {
+	Value string
+}
+
+func (s *String) Type() ObjectType { return STRING_OBJ }
+func (s *String) Inspect() string  { return s.Value }

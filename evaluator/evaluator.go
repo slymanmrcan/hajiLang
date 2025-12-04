@@ -7,7 +7,6 @@ import (
 	"github.com/slymanmrcan/hajilang/object"
 )
 
-// --- EKSİK OLAN KISIM 1: GLOBAL TRUE/FALSE ---
 var (
 	TRUE  = &object.Boolean{Value: true}
 	FALSE = &object.Boolean{Value: false}
@@ -16,15 +15,12 @@ var (
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
 
-	// 1. Program
 	case *ast.Program:
 		return evalProgram(node, env)
 
-	// 2. Expression Statement
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression, env)
 
-	// 3. Let Statement
 	case *ast.LetStatement:
 		val := Eval(node.Value, env)
 		if isError(val) {
@@ -33,26 +29,25 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		env.Set(node.Name.Value, val)
 		return nil
 
-	// 4. Identifier (Değişken)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 
-	// --- EKSİK OLAN KISIM 2: IF VE BLOKLAR ---
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
 
 	case *ast.IfExpression:
 		return evalIfExpression(node, env)
 
-	// 5. Tamsayılar
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 
-	// --- EKSİK OLAN KISIM 3: BOOLEAN ---
 	case *ast.Boolean:
 		return nativeBoolToBooleanObject(node.Value)
 
-	// 6. Prefix (-5, !true)
+	// STRING LITERAL EKLEME
+	case *ast.StringLiteral:
+		return &object.String{Value: node.Value}
+
 	case *ast.PrefixExpression:
 		right := Eval(node.Right, env)
 		if isError(right) {
@@ -60,7 +55,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		return evalPrefixExpression(node.Operator, right)
 
-	// 7. Infix (5 + 5, 10 < 20)
 	case *ast.InfixExpression:
 		left := Eval(node.Left, env)
 		if isError(left) {
@@ -167,20 +161,48 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 }
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
+	// STRING BİRLEŞTİRME - YENİ EKLEME
+	if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
+		return evalStringInfixExpression(operator, left, right)
+	}
+
+	// INTEGER İŞLEMLERİ
 	if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 		return evalIntegerInfixExpression(operator, left, right)
 	}
-	// Boolean Karşılaştırma (==, !=)
+
+	// BOOLEAN KARŞILAŞTIRMA
 	if operator == "==" {
 		return nativeBoolToBooleanObject(left == right)
 	}
 	if operator == "!=" {
 		return nativeBoolToBooleanObject(left != right)
 	}
+
+	// TÜR UYUŞMAZLIĞI
 	if left.Type() != right.Type() {
 		return newError("tür uyuşmazlığı: %s %s %s", left.Type(), operator, right.Type())
 	}
+
 	return newError("bilinmeyen operatör: %s %s %s", left.Type(), operator, right.Type())
+}
+
+// STRING İŞLEMLERİ - YENİ FONKSİYON
+func evalStringInfixExpression(operator string, left, right object.Object) object.Object {
+	leftVal := left.(*object.String).Value
+	rightVal := right.(*object.String).Value
+
+	switch operator {
+	case "+":
+		// String birleştirme
+		return &object.String{Value: leftVal + rightVal}
+	case "==":
+		return nativeBoolToBooleanObject(leftVal == rightVal)
+	case "!=":
+		return nativeBoolToBooleanObject(leftVal != rightVal)
+	default:
+		return newError("bilinmeyen operatör: %s %s %s", left.Type(), operator, right.Type())
+	}
 }
 
 func evalIntegerInfixExpression(operator string, left, right object.Object) object.Object {
@@ -199,7 +221,6 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 			return newError("sıfıra bölünemez!")
 		}
 		return &object.Integer{Value: leftVal / rightVal}
-	// --- EKSİK OLAN KISIM 4: KÜÇÜKTÜR/BÜYÜKTÜR ---
 	case "<":
 		return nativeBoolToBooleanObject(leftVal < rightVal)
 	case ">":

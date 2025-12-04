@@ -31,8 +31,6 @@ func main() {
 
 	kod := string(icerik)
 	fmt.Printf(">> '%s' çalıştırılıyor...\n", dosyaAdi)
-	fmt.Println("--------------------------------------------")
-
 	// 1. Lexer
 	l := lexer.New(kod)
 	// 2. Parser

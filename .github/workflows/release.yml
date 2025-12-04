@@ -1,0 +1,132 @@
+name: Build and Release
+
+# Trigger: Tag push veya manuel çalıştırma
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:  # Manuel tetikleme için
+
+jobs:
+  build:
+    name: Build HajiLang
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        # Çoklu platform build
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+          - goos: windows
+            goarch: amd64
+    
+    steps:
+      # 1. Kodu çek
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # 2. Go'yu kur
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      
+      # 3. Bağımlılıkları indir
+      - name: Get dependencies
+        run: go mod download
+      
+      # 4. dist klasörü oluştur
+      - name: Create dist directory
+        run: mkdir -p dist
+      
+      # 5. Build al
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          OUTPUT_NAME="hajilang-${{ matrix.goos }}-${{ matrix.goarch }}"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            OUTPUT_NAME="${OUTPUT_NAME}.exe"
+          fi
+          go build -ldflags="-s -w -X main.Version=${{ github.ref_name }}" -o dist/$OUTPUT_NAME main.go
+          
+          # Binary boyutunu göster
+          ls -lh dist/$OUTPUT_NAME
+      
+      # 6. Binary'yi artifact olarak kaydet
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: dist/*
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Kodu çek
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # 2. Tüm artifact'leri indir
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: binaries
+          path: ./dist
+      
+      # 3. Release oluştur veya güncelle
+      - name: Create or Update Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name || 'v1.0.0' }}
+          name: HajiLang ${{ github.ref_name || 'v1.0.0' }}
+          body: |
+            ## HajiLang Release ${{ github.ref_name || 'v1.0.0' }}
+            
+            ### Özellikler
+            - ✅ Integer, Boolean, String desteği
+            - ✅ If-Else koşulları
+            - ✅ Değişken tanımlama (let)
+            - ✅ Aritmetik operatörler (+, -, *, /)
+            - ✅ Karşılaştırma operatörleri (<, >, ==, !=)
+            - ✅ Yorum satırları (//)
+            
+            ### Kullanım
+            ```bash
+            # Linux/macOS
+            chmod +x hajilang-linux-amd64
+            ./hajilang-linux-amd64 test.haji
+            
+            # Windows
+            hajilang-windows-amd64.exe test.haji
+            ```
+            
+            ### Örnek Kod
+            ```
+            let x = 10;
+            let y = 20;
+            
+            if (x < y) {
+                "x küçük";
+            } else {
+                "x büyük";
+            }
+            ```
+          draft: false
+          prerelease: false
+          files: ./dist/*

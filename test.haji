@@ -1,5 +1,9 @@
-let x = 12;
+let x = 5;
 let y = 10;
-if(x>y){
-  y
+let sonuc = x + y;
+
+if (sonuc > 12) {
+    "Büyük";
+} else {
+    "Küçük";
 }

@@ -12,8 +12,9 @@ const (
 	EOF     = "EOF"
 
 	// Tanımlayıcılar
-	IDENT = "IDENT"
-	INT   = "INT"
+	IDENT  = "IDENT"
+	INT    = "INT"
+	STRING = "STRING"
 
 	// Operatörler
 	ASSIGN   = "="
