@@ -30,11 +30,11 @@ jobs:
     steps:
       # 1. Kodu çek
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       # 2. Go'yu kur
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.21'
       
@@ -64,9 +64,9 @@ jobs:
       
       # 6. Binary'yi artifact olarak kaydet
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: binaries
+          name: hajilang-${{ matrix.goos }}-${{ matrix.goarch }}
           path: dist/*
 
   release:
@@ -77,14 +77,15 @@ jobs:
     steps:
       # 1. Kodu çek
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       # 2. Tüm artifact'leri indir
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: binaries
           path: ./dist
+          pattern: hajilang-*
+          merge-multiple: true
       
       # 3. Release oluştur veya güncelle
       - name: Create or Update Release
