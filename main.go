@@ -16,7 +16,7 @@ func main() {
 		repl.Start(os.Stdin, os.Stdout)
 		return
 	}
-	if len(os.Args) < 2 {
+	if len(os.Args) < 2 && os.Args[1] == "--version" {
 		fmt.Println("Kullanım: ./hajilang dosya.haji")
 		fmt.Println("  veya   hajilang (REPL için)")
 		return
