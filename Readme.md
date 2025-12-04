@@ -1,58 +1,95 @@
 # HajiLang
 
-HajiLang, Go ile yazılmış, eğlence amaçlı küçük bir yorumlayıcıdır. Lexer, parser, AST ve evaluator katmanlarını baştan kurarak basit bir dilin nasıl çalıştığını gösterir.
+Go ile yazılmış, eğlence amaçlı küçük bir yorumlayıcı.
 
-## Neler Destekleniyor?
-- `let` ile değişken tanımlama ve yeniden değerlendirme (tek tip atama formu)
-- Tamsayı ve boolean değerler; tek satır yorumlar (`// ...`)
-- Aritmetik: `+`, `-`, `*`, `/`; unary `-` ve `!`
-- Karşılaştırmalar: `<`, `>`, `==`, `!=` (sayılar ve booleanlarda)
-- Parantezlerle öncelik kontrolü
-- `if { ... } else { ... }` blokları; koşul sağlanmazsa `nil` dönme
-- Hata yakalama: sözdizimi hataları, tanımsız değişken, tür uyumsuzluğu, sıfıra bölme
+## Kurulum
 
-Henüz stringler, fonksiyonlar ve `return` gibi yapılar yok; dil kasıtlı olarak küçük tutuldu.
+### 1. Go ile (önerilen)
 
-## Proje Yapısı
-- `lexer/`, `parser/`, `ast/`: Ön uç ve ağaç üretimi
-- `evaluator/`: AST yorumlayıcısı (çalıştırıcı)
-- `object/`: Çalışma zamanı türleri ve ortam (environment)
-- `token/`: Token tanımları ve anahtar kelimeler
-- `main.go`: Dosya okuma, derleme hattı ve yürütme
-
-## Hızlı Başlangıç
-Ön koşul: Go 1.21+.
+Go yüklüyse:
 
 ```bash
-# ikiliyi üret
-go build -o hajilang main.go
-
-# bir programı çalıştır
-./hajilang test.haji
+go install github.com/slymanmrcan/hajilang@latest
 ```
 
-`./hajilang` bir dosya yolu bekler; kodda hata varsa konsola raporlar.
+### 2. Otomatik Script ile
 
-## Örnek Program
-```javascript
-// basit matematik ve koşul
+**Linux/macOS:**
+```bash
+curl -sSL https://raw.githubusercontent.com/slymanmrcan/hajilang/main/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/slymanmrcan/hajilang/main/install.ps1 | iex
+```
+
+### 3. Manuel Kurulum
+
+[Releases](https://github.com/slymanmrcan/hajilang/releases/latest) sayfasından işletim sistemine uygun binary'yi indir.
+
+**Linux/macOS:**
+```bash
+# İndir
+wget https://github.com/slymanmrcan/hajilang/releases/latest/download/hajilang-linux-amd64
+chmod +x hajilang-linux-amd64
+sudo mv hajilang-linux-amd64 /usr/local/bin/hajilang
+```
+
+**Windows:**
+Binary'yi indir, bir klasöre koy ve PATH'e ekle.
+
+## Kullanım
+
+```bash
+# REPL modu
+hajilang
+
+# Dosyadan çalıştır
+hajilang dosya.haji
+```
+
+## Özellikler
+
+- ✅ Let ile değişken tanımlama
+- ✅ Integer ve Boolean
+- ✅ Aritmetik operatörler (+, -, *, /)
+- ✅ Karşılaştırma (<, >, ==, !=)
+- ✅ If/Else
+- ✅ Yorumlar (//)
+- ✅ REPL (interaktif mod)
+
+## Örnek
+
+```haji
+// Basit matematik ve koşul
 let x = 12 + 3 * 2;
 let y = 10;
 
 if (x > y) {
-  x - y;
+    x - y;
 } else {
-  0;
+    0;
 }
 ```
 
-## Dil Kuralları (Kısa Özet)
-- İfadeler `;` ile sonlanabilir; parser son satırı da kabul eder ama tutarlılık için noktalı virgül kullanın.
-- Parantezler önceliği değiştirir, aksi halde `*`/`/` > `+`/`-` > karşılaştırma > `==`/`!=` > unary.
-- `if` koşulu parantez ister; bloklar `{ ... }` içinde yazılır; `else` isteğe bağlıdır.
-- Yorumlar `//` ile başlar ve satır sonuna kadar gider; evaluator tarafından yok sayılır.
+## Geliştirme
 
-## Yol Haritası
-- `return` ve bloktan erken çıkış
-- Fonksiyon tanımlama/çağırma
-- Daha fazla tür (string, dizi, map) ve yerleşik fonksiyonlar
+```bash
+# Klonla
+git clone https://github.com/slymanmrcan/hajilang
+cd hajilang
+
+# Derle
+make build
+
+# Test et
+make run
+
+# REPL
+make repl
+```
+
+## Lisans
+
+MIT

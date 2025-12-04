@@ -32,3 +32,5 @@ vendor/
 # Geçici dosyalar
 tmp/
 temp/
+
+dist/
