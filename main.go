@@ -83,6 +83,8 @@ func calistirDosya(dosyaAdi string) {
 		// Eğer dönen şey bir HATA nesnesi ise ekrana kırmızı bas
 		if sonuc.Type() == object.ERROR_OBJ {
 			fmt.Println("❌ ÇALIŞMA HATASI: " + sonuc.Inspect())
+		} else {
+			fmt.Println(sonuc.Inspect())
 		}
 		// İsteğe bağlı: Scriptin son sonucunu görmek istersen bunu aç:
 		// else {

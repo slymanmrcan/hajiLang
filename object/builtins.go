@@ -31,8 +31,15 @@ var Builtins = map[string]*Builtin{
 	"puts": &Builtin{
 		Fn: func(args ...Object) Object {
 			for _, arg := range args {
-				fmt.Println(arg.Inspect())
+				// İŞTE BU SATIR EKRANA YAZAR
+				// Eğer arg.Inspect() string tırnaklarıyla geliyorsa direkt Value yazdırabiliriz
+				if str, ok := arg.(*String); ok {
+					fmt.Println(str.Value)
+				} else {
+					fmt.Println(arg.Inspect())
+				}
 			}
+			// puts bir değer dönmez, işi biter. NULL döner.
 			return NULL
 		},
 	},
