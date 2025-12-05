@@ -11,14 +11,15 @@ import (
 type ObjectType string
 
 const (
-	INTEGER_OBJ = "INTEGER"
-	ERROR_OBJ   = "ERROR"
-	STRING_OBJ  = "STRING"
-	BOOLEAN_OBJ = "BOOLEAN"
-	BUILTIN_OBJ = "BUILTIN"
-	NULL_OBJ    = "NULL"
-	ARRAY_OBJ   = "ARRAY"
-	HASH_OBJ    = "HASH"
+	INTEGER_OBJ      = "INTEGER"
+	ERROR_OBJ        = "ERROR"
+	STRING_OBJ       = "STRING"
+	BOOLEAN_OBJ      = "BOOLEAN"
+	BUILTIN_OBJ      = "BUILTIN"
+	NULL_OBJ         = "NULL"
+	ARRAY_OBJ        = "ARRAY"
+	HASH_OBJ         = "HASH"
+	RETURN_VALUE_OBJ = "RETURN_VALUE"
 )
 
 type Object interface {
@@ -52,6 +53,13 @@ func (ao *Array) Inspect() string {
 
 	return out.String()
 }
+
+type ReturnValue struct {
+	Value Object
+}
+
+func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
+func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
 
 // Builtin fonksiyon tipi tanımı
 type BuiltinFunction func(args ...Object) Object

@@ -9,101 +9,102 @@ import (
 	"github.com/slymanmrcan/hajilang/object"
 	"github.com/slymanmrcan/hajilang/parser"
 	"github.com/slymanmrcan/hajilang/repl"
-	"github.com/slymanmrcan/hajilang/runtime" // <--- MUTLAKA EKLE
+	"github.com/slymanmrcan/hajilang/runtime"
 )
 
 func main() {
-	// 1. HİÇ ARGÜMAN YOKSA -> REPL MODU
-	// Kullanım: go run main.go
+	// No arguments -> REPL mode
 	if len(os.Args) < 2 {
-		fmt.Println("HajiLang REPL (Çıkış için CTRL+C)")
+		fmt.Println("HajiLang REPL v1.0 (Press CTRL+C to exit)")
 		repl.Start(os.Stdin, os.Stdout)
 		return
 	}
-	// İlk argümanı al (server mı? dosya adı mı?)
-	komut := os.Args[1]
-	// 2. SERVER MODU
-	// Kullanım: go run main.go server
-	// 2. SERVER MODU
-	if komut == "server" {
-		dosya := "server.haji" // Varsayılan dosya adı
-		// Eğer kullanıcı "go run main.go server benimapi.haji" dediyse:
+
+	command := os.Args[1]
+
+	// Server mode
+	if command == "server" {
+		filename := "server.haji"
 		if len(os.Args) > 2 {
-			dosya = os.Args[2]
+			filename = os.Args[2]
 		}
-		runtime.RunServer(dosya)
+		runtime.RunServer(filename)
 		return
 	}
-	// 3. VERSİYON/YARDIM
-	if komut == "--help" || komut == "--version" {
-		yazdirYardim()
+
+	// Help/Version
+	if command == "--help" || command == "-h" || command == "--version" {
+		printHelp()
 		return
 	}
-	// 4. DOSYA ÇALIŞTIRMA MODU
-	// Kullanım: go run main.go dosya.haji
-	calistirDosya(komut)
+
+	// Execute file
+	executeFile(command)
 }
 
-func calistirDosya(dosyaAdi string) {
-	icerik, err := os.ReadFile(dosyaAdi)
+func executeFile(filename string) {
+	source, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("Hata: '%s' dosyası okunamadı.\nSebep: %s\n", dosyaAdi, err)
+		fmt.Printf("Error: Cannot read file '%s'\nReason: %s\n", filename, err)
 		return
 	}
 
-	kod := string(icerik)
-	fmt.Printf(">> '%s' çalıştırılıyor...\n", dosyaAdi)
+	code := string(source)
+	fmt.Printf(">> Executing '%s'...\n", filename)
 
-	// Environment (Ortam) Oluştur
+	// Setup environment
 	env := object.NewEnvironment()
-
-	// Modülleri yükle
 	runtime.RegisterJSON(env)
 	runtime.RegisterUtils(env)
 
-	l := lexer.New(kod)
+	// Lexer + Parser
+	l := lexer.New(code)
 	p := parser.New(l)
 	program := p.ParseProgram()
 
-	// 1. PARSER HATALARI (Yazım hataları)
+	fmt.Printf(">> Parsed %d statement(s)\n", len(program.Statements))
+	// BU SATIRLARI EKLEYİN:
+	fmt.Println("=== PARSED AST ===")
+	for i, stmt := range program.Statements {
+		fmt.Printf("%d: %s\n", i, stmt.String())
+	}
+	fmt.Println("==================")
+	// Check parser errors
 	if len(p.Errors()) != 0 {
-		fmt.Println("❌ YAZIM HATALARI VAR (PARSER):")
+		fmt.Println("❌ PARSE ERRORS:")
 		for _, msg := range p.Errors() {
-			fmt.Printf("\t-> %s\n", msg)
+			fmt.Printf("   -> %s\n", msg)
 		}
 		return
 	}
 
-	// 2. ÇALIŞTIRMA (Eval)
-	// Eval fonksiyonu bir nesne döner. Bu nesne HATA olabilir!
-	sonuc := evaluator.Eval(program, env)
+	// Evaluate
+	result := evaluator.Eval(program, env)
 
-	// 3. RUNTIME HATALARI (Çalışma zamanı hataları)
-	if sonuc != nil {
-		// Eğer dönen şey bir HATA nesnesi ise ekrana kırmızı bas
-		if sonuc.Type() == object.ERROR_OBJ {
-			fmt.Println("❌ ÇALIŞMA HATASI: " + sonuc.Inspect())
-		} else {
-			fmt.Println(sonuc.Inspect())
+	// Only show errors (puts already prints itself)
+	if result != nil {
+		if result.Type() == object.ERROR_OBJ {
+			fmt.Println("❌ RUNTIME ERROR:", result.Inspect())
+		} else if result.Type() != object.NULL_OBJ {
+			// Program sonucu NULL değilse göster (REPL gibi)
+			fmt.Println(result.Inspect())
 		}
-		// İsteğe bağlı: Scriptin son sonucunu görmek istersen bunu aç:
-		// else {
-		// 	fmt.Println(sonuc.Inspect())
-		// }
 	}
 }
 
-func yazdirYardim() {
+func printHelp() {
 	fmt.Println(`
-HajiLang Kullanım Kılavuzu:
----------------------------
-1. REPL (Konsol) Modu:
-   ./hajilang
+HajiLang Interpreter v1.0
+-------------------------
+Usage:
+  hajilang                    Start REPL mode
+  hajilang <file.haji>        Execute a file
+  hajilang server [file]      Start HTTP server
+  hajilang --help             Show this help
 
-2. Dosya Çalıştırma:
-   ./hajilang dosya.haji
-
-3. Web Sunucusu Başlatma:
-   ./hajilang server
+Examples:
+  hajilang                    # Interactive mode
+  hajilang app.haji           # Run app.haji
+  hajilang server api.haji    # Start server with api.haji
 	`)
 }

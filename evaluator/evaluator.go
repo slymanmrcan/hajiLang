@@ -19,7 +19,20 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalProgram(node, env)
 
 	case *ast.ExpressionStatement:
-		return Eval(node.Expression, env)
+		result := Eval(node.Expression, env)
+		// Eğer bu bir fonksiyon çağrısı ise (örn: puts) ve NULL döndüyse
+		// bunu yok say, devam et
+		return result
+	case *ast.CallExpression:
+		function := Eval(node.Function, env)
+		if isError(function) {
+			return function
+		}
+		args := evalExpressions(node.Arguments, env)
+		if len(args) == 1 && isError(args[0]) {
+			return args[0]
+		}
+		return applyFunction(function, args)
 
 	case *ast.LetStatement:
 		val := Eval(node.Value, env)
@@ -92,9 +105,17 @@ func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	var result object.Object
 	for _, statement := range program.Statements {
 		result = Eval(statement, env)
-		if result != nil && result.Type() == object.ERROR_OBJ {
-			return result
+
+		// Sadece RETURN veya ERROR varsa dur
+		if result != nil {
+			switch result.(type) {
+			case *object.ReturnValue:
+				return result.(*object.ReturnValue).Value
+			case *object.Error:
+				return result
+			}
 		}
+		// Diğer durumlarda (NULL, Integer, vb.) devam et
 	}
 	return result
 }
@@ -103,9 +124,17 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 	var result object.Object
 	for _, statement := range block.Statements {
 		result = Eval(statement, env)
-		if result != nil && result.Type() == object.ERROR_OBJ {
-			return result
+
+		// SADECE ERROR veya RETURN durumunda dur
+		if result != nil {
+			switch result.(type) {
+			case *object.ReturnValue:
+				return result
+			case *object.Error:
+				return result
+			}
 		}
+		// NULL veya başka değerlerde devam et
 	}
 	return result
 }
@@ -128,11 +157,11 @@ func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Obje
 	}
 
 	if isTruthy(condition) {
-		return Eval(ie.Consequence, env)
+		return Eval(ie.Consequence, env) // ← Bu evalBlockStatement çağırıyor
 	} else if ie.Alternative != nil {
 		return Eval(ie.Alternative, env)
 	} else {
-		return nil
+		return object.NULL // ← Burada object.NULL döndür (nil değil!)
 	}
 }
 
@@ -182,6 +211,8 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 }
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
+	// fmt.Printf("[DEBUG] Karşılaştırma: %s (%s) %s %s (%s)\n",
+	// 	left.Inspect(), left.Type(), operator, right.Inspect(), right.Type())
 	// STRING BİRLEŞTİRME - YENİ EKLEME
 	if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
 		return evalStringInfixExpression(operator, left, right)
@@ -357,4 +388,12 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 	}
 
 	return result
+}
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+	// Builtin fonksiyon mu? (puts, len, first vb.)
+	if builtin, ok := fn.(*object.Builtin); ok {
+		return builtin.Fn(args...)
+	}
+
+	return newError("not a function: %s", fn.Type())
 }

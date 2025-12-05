@@ -18,6 +18,8 @@ const (
 	PRODUCT     // *
 	PREFIX      // -X veya !X
 	CALL        // fonksiyon(X)
+	OTHER       // diğerleri
+	INDEX       // dizi[indeks]
 )
 
 var precedences = map[token.TokenType]int{
@@ -29,6 +31,8 @@ var precedences = map[token.TokenType]int{
 	token.MINUS:    SUM,
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
+	token.LPAREN:   CALL,
+	token.LBRACKET: INDEX,
 }
 
 type (
@@ -76,6 +80,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral) // [1, 2]
 	p.registerPrefix(token.LBRACE, p.parseHashLiteral)    // {"a": 1}
 
+	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression) // dizi[0]
 	p.nextToken()
 	p.nextToken()
@@ -399,4 +404,11 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 
 func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
+}
+func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	fmt.Printf("[PARSER DEBUG] parseCallExpression çağrıldı! Function: %s\n", function.String())
+	exp := &ast.CallExpression{Token: p.curToken, Function: function}
+	exp.Arguments = p.parseExpressionList(token.RPAREN)
+	fmt.Printf("[PARSER DEBUG] Arguments: %d tane\n", len(exp.Arguments))
+	return exp
 }

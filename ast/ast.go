@@ -26,6 +26,11 @@ type Expression interface {
 type Program struct {
 	Statements []Statement
 }
+type CallExpression struct {
+	Token     token.Token // '(' token
+	Function  Expression  // Identifier veya FunctionLiteral
+	Arguments []Expression
+}
 
 func (p *Program) TokenLiteral() string {
 	if len(p.Statements) > 0 {
@@ -249,4 +254,13 @@ func (hl *HashLiteral) String() string {
 	out.WriteString(strings.Join(pairs, ", "))
 	out.WriteString("}")
 	return out.String()
+}
+func (ce *CallExpression) expressionNode()      {}
+func (ce *CallExpression) TokenLiteral() string { return ce.Token.Literal }
+func (ce *CallExpression) String() string {
+	var args []string
+	for _, a := range ce.Arguments {
+		args = append(args, a.String())
+	}
+	return ce.Function.String() + "(" + strings.Join(args, ", ") + ")"
 }
