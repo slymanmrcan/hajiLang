@@ -29,6 +29,7 @@ const (
 
 	EQ     = "=="
 	NOT_EQ = "!="
+	COLON  = ":"
 
 	// Ayıraçlar
 	COMMA     = ","
@@ -37,6 +38,9 @@ const (
 	RPAREN    = ")"
 	LBRACE    = "{"
 	RBRACE    = "}"
+
+	LBRACKET = "[" //
+	RBRACKET = "]" // 
 
 	// Keywordler
 	FUNCTION = "FUNCTION"

@@ -64,6 +64,8 @@ func (l *Lexer) NextToken() token.Token {
 		}
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)
+	case ':':
+		tok = newToken(token.COLON, l.ch) //
 	case '(':
 		tok = newToken(token.LPAREN, l.ch)
 	case ')':
@@ -74,6 +76,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.PLUS, l.ch)
 	case '-':
 		tok = newToken(token.MINUS, l.ch)
+	case '[':
+		tok = newToken(token.LBRACKET, l.ch) //
+	case ']':
+		tok = newToken(token.RBRACKET, l.ch) //
 	case '/':
 		// Eğer bir sonraki de '/' ise bu bir yorumdur!
 		if l.peekChar() == '/' {
@@ -135,6 +141,16 @@ func (l *Lexer) readString() string {
 	position := l.position + 1
 	for {
 		l.readChar()
+
+		// Eğer \ (ters taksim) görürsek, bu bir kaçış karakteridir.
+		// Bir sonraki karakteri de stringin parçası olarak kabul et ve döngüye devam et.
+		// Böylece string " işaretini görünce bitmez.
+		if l.ch == '\\' {
+			l.readChar() // \ işaretinden sonrakini oku (örn: " işaretini)
+			continue
+		}
+
+		// Stringin sonuna geldik mi? (EOF veya " işareti)
 		if l.ch == '"' || l.ch == 0 {
 			break
 		}
