@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/slymanmrcan/hajilang/evaluator"
 	"github.com/slymanmrcan/hajilang/lexer"
@@ -28,6 +30,14 @@ func main() {
 		if len(os.Args) > 2 {
 			filename = os.Args[2]
 		}
+
+		// ← BURASI ÇOK ÖNEMLİ! ScriptBaseDir'i ayarla
+		absPath, err := filepath.Abs(filename)
+		if err == nil {
+			runtime.ScriptBaseDir = filepath.Dir(absPath)
+			fmt.Printf("📁 Base Directory: %s\n", runtime.ScriptBaseDir)
+		}
+
 		runtime.RunServer(filename)
 		return
 	}
@@ -39,20 +49,26 @@ func main() {
 	}
 
 	// Execute file
-	executeFile(command)
+	executeFileWithLogging(command)
 }
 
-func executeFile(filename string) {
-	source, err := os.ReadFile(filename)
+func executeFileWithLogging(filename string) {
+	source, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("Error: Cannot read file '%s'\nReason: %s\n", filename, err)
+		fmt.Printf("❌ Dosya okunamadı: %s\n", err.Error())
 		return
 	}
 
-	code := string(source)
-	fmt.Printf(">> Executing '%s'...\n", filename)
+	// ScriptBaseDir'i execute file için de ayarla
+	absPath, err := filepath.Abs(filename)
+	if err == nil {
+		runtime.ScriptBaseDir = filepath.Dir(absPath)
+	}
 
-	// Setup environment
+	code := string(source)
+	fmt.Printf(">> '%s' dosyası çalıştırılıyor...\n", filename)
+
+	// Ortamı ayarla
 	env := object.NewEnvironment()
 	runtime.RegisterJSON(env)
 	runtime.RegisterUtils(env)
@@ -62,31 +78,25 @@ func executeFile(filename string) {
 	p := parser.New(l)
 	program := p.ParseProgram()
 
-	fmt.Printf(">> Parsed %d statement(s)\n", len(program.Statements))
-	// BU SATIRLARI EKLEYİN:
-	fmt.Println("=== PARSED AST ===")
-	for i, stmt := range program.Statements {
-		fmt.Printf("%d: %s\n", i, stmt.String())
-	}
-	fmt.Println("==================")
-	// Check parser errors
+	fmt.Printf(">> %d ifade(ler) ayrıştırıldı\n", len(program.Statements))
+
+	// Parser hatalarını kontrol et
 	if len(p.Errors()) != 0 {
-		fmt.Println("❌ PARSE ERRORS:")
+		fmt.Println("❌ AYRIŞTIRMA HATALARI:")
 		for _, msg := range p.Errors() {
 			fmt.Printf("   -> %s\n", msg)
 		}
 		return
 	}
 
-	// Evaluate
+	// Değerlendir
 	result := evaluator.Eval(program, env)
 
-	// Only show errors (puts already prints itself)
+	// Sadece hataları göster
 	if result != nil {
 		if result.Type() == object.ERROR_OBJ {
-			fmt.Println("❌ RUNTIME ERROR:", result.Inspect())
+			fmt.Println("❌ ÇALIŞMA ZAMANI HATASI:", result.Inspect())
 		} else if result.Type() != object.NULL_OBJ {
-			// Program sonucu NULL değilse göster (REPL gibi)
 			fmt.Println(result.Inspect())
 		}
 	}

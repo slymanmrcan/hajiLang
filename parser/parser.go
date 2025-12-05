@@ -122,7 +122,26 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseExpressionStatement()
 	}
 }
+func (p *Parser) parseAssignmentStatement() *ast.LetStatement {
+	// Assignment'ı LetStatement olarak kullanıyoruz (veya yeni bir AST tipi oluşturabilirsin)
+	stmt := &ast.LetStatement{Token: token.Token{Type: token.LET, Literal: "let"}}
 
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekToken.Type == token.SEMICOLON {
+		p.nextToken()
+	}
+
+	return stmt
+}
 func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.curToken}
 
@@ -216,16 +235,19 @@ func (p *Parser) parseStringLiteral() ast.Expression {
 func (p *Parser) parseIfExpression() ast.Expression {
 	expression := &ast.IfExpression{Token: p.curToken}
 
-	// if'ten sonra '(' gelmeli (isteğe bağlı ama biz zorunlu tutalım)
-	if !p.expectPeek(token.LPAREN) {
-		return nil
-	}
-
+	// if'ten sonra koşul - PARANTEZ OLMADAN da çalışsın
 	p.nextToken()
-	expression.Condition = p.parseExpression(LOWEST)
 
-	if !p.expectPeek(token.RPAREN) {
-		return nil
+	// Eğer '(' varsa, parantezli syntax
+	if p.curToken.Type == token.LPAREN {
+		p.nextToken()
+		expression.Condition = p.parseExpression(LOWEST)
+		if !p.expectPeek(token.RPAREN) {
+			return nil
+		}
+	} else {
+		// Parantezsiz syntax: if path == "/" {
+		expression.Condition = p.parseExpression(LOWEST)
 	}
 
 	if !p.expectPeek(token.LBRACE) {
@@ -236,11 +258,28 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 	// ELSE var mı?
 	if p.peekToken.Type == token.ELSE {
-		p.nextToken()
-		if !p.expectPeek(token.LBRACE) {
-			return nil
+		p.nextToken() // else'i geç
+
+		// else if mi?
+		if p.peekToken.Type == token.IF {
+			p.nextToken() // if'e geç
+			// else if'i yeni bir IfExpression olarak parse et
+			elseIfExp := p.parseIfExpression()
+			// Bunu bir block içine koy
+			expression.Alternative = &ast.BlockStatement{
+				Token: p.curToken,
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      p.curToken,
+						Expression: elseIfExp,
+					},
+				},
+			}
+		} else if p.peekToken.Type == token.LBRACE {
+			// Normal else bloğu
+			p.nextToken()
+			expression.Alternative = p.parseBlockStatement()
 		}
-		expression.Alternative = p.parseBlockStatement()
 	}
 
 	return expression

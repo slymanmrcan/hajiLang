@@ -1,36 +1,13 @@
-// server.haji
+let method = CTX["method"]
+let path = CTX["path"]
+let response = {"status": 404, "body": "Not Found"}
 
-let method = CTX["method"]; 
-let path = CTX["path"];
-let dbPath = "data/posts.json";
+if (path == "/") {
+    let html = json_read("index.html")
+    let response = {"status": 200, "body": html}
+}
 
-// puts falan yok, risk yok.
-
-let response = if (path == "/api/posts") {
-    // 1. Durum: /api/posts
-    if (method == "GET") {
-        let data = json_read(dbPath);
-        { "status": 200, "body": data }
-    } else {
-        { "status": 201, "body": "POST Basarili" }
-    }
-} else {
-    // 2. Durum: /api/posts/ (Sonunda slaş var mı?)
-    if (path == "/api/posts/") {
-        if (method == "GET") {
-            let data = json_read(dbPath);
-            { "status": 200, "body": data }
-        } else {
-            { "status": 201, "body": "POST Basarili" }
-        }
-    } else {
-        // 3. Durum: Ana Sayfa
-        if (path == "/") {
-            { "status": 200, "body": "<h1>Calisiyor</h1>" }
-        } else {
-            // 4. Durum: Hata
-            // Path'i ekrana basmakla uğraşmıyoruz, hata vermesin yeter.
-            { "status": 404, "body": "{\"error\": \"Sayfa Yok\"}" }
-        }
-    }
-};
+if (path == "/api/cv") {
+    let data = json_read("data/cv.json")
+    let response = {"status": 200, "body": data}
+}

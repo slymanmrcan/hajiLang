@@ -3,9 +3,12 @@ package runtime
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 
 	"github.com/slymanmrcan/hajilang/object"
 )
+
+var ScriptBaseDir string
 
 func RegisterJSON(builtinEnv *object.Environment) {
 	// json_read("data.json") -> Dosya içeriğini string olarak döner
@@ -15,6 +18,12 @@ func RegisterJSON(builtinEnv *object.Environment) {
 				return &object.Error{Message: "wrong number of args"}
 			}
 			path := args[0].(*object.String).Value
+
+			// Eğer mutlak yol değilse, script dizinine göre yorumla
+			if !filepath.IsAbs(path) && ScriptBaseDir != "" {
+				path = filepath.Join(ScriptBaseDir, path)
+			}
+
 			data, err := os.ReadFile(path)
 			if err != nil {
 				return &object.Error{Message: err.Error()}

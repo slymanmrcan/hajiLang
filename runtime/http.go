@@ -14,7 +14,6 @@ import (
 )
 
 // RunServer: Sunucuyu başlatan ana fonksiyon
-// RunServer artık dosya yolunu parametre olarak alıyor
 func RunServer(scriptPath string) {
 
 	// 1. Favicon hatasını sustur (Boş cevap dön)
@@ -41,44 +40,48 @@ func RunServer(scriptPath string) {
 			id = pathParts[len(pathParts)-1]
 		}
 
+		// CTX hash'ini oluştur
 		ctxMap := make(map[object.HashKey]object.HashPair)
 		addToHash(ctxMap, "method", method)
 		addToHash(ctxMap, "body", bodyStr)
-		addToHash(ctxMap, "path", r.URL.Path) // Script içinde path kontrolü yapabilmek için
+		addToHash(ctxMap, "path", r.URL.Path)
 		addToHash(ctxMap, "id", id)
 
 		env.Set("CTX", &object.Hash{Pairs: ctxMap})
 
 		// DİNAMİK DOSYA OKUMA
-		// Parametre olarak gelen scriptPath'i kullanıyoruz
 		scriptBytes, err := os.ReadFile(scriptPath)
 		if err != nil {
-			// Dosya yoksa 500 dön ve ekrana bas
 			errMsg := fmt.Sprintf("Server dosyası bulunamadı: %s", scriptPath)
 			fmt.Println(errMsg)
 			http.Error(w, errMsg, 500)
 			return
 		}
 
+		// Script'i parse et
 		l := lexer.New(string(scriptBytes))
 		p := parser.New(l)
 		program := p.ParseProgram()
 
+		// Parser hataları varsa
 		if len(p.Errors()) > 0 {
 			msg := strings.Join(p.Errors(), "\n")
 			http.Error(w, "Haji Script Hatası:\n"+msg, 500)
 			return
 		}
 
+		// Script'i çalıştır
 		evaluated := evaluator.Eval(program, env)
 
-		// Eğer çalışma zamanı hatası (Runtime Error) varsa:
+		// Runtime hatası varsa
 		if evaluated != nil && evaluated.Type() == object.ERROR_OBJ {
 			errMsg := fmt.Sprintf("Script Çalışma Hatası: %s", evaluated.Inspect())
-			fmt.Println("❌ " + errMsg) // Terminale bas
-			http.Error(w, errMsg, 500) // Tarayıcıya bas
+			fmt.Println("❌ " + errMsg)
+			http.Error(w, errMsg, 500)
 			return
 		}
+
+		// Cevabı gönder
 		sendResponse(w, env)
 	})
 
@@ -87,14 +90,10 @@ func RunServer(scriptPath string) {
 	http.ListenAndServe(":8080", nil)
 }
 
-// ... sendResponse ve addToHash aynı kalacak ...
-// (Buraya kopyalamadım, önceki koddaki sendResponse ve addToHash fonksiyonları aynen kalsın)
-
-// sendResponse: Scriptin oluşturduğu 'response' değişkenini okur ve HTTP cevabı verir
+// sendResponse: Script'in oluşturduğu 'response' değişkenini okur ve HTTP cevabı verir
 func sendResponse(w http.ResponseWriter, env *object.Environment) {
 	obj, ok := env.Get("response")
 	if !ok || obj == nil {
-		// Script bir cevap üretmediyse
 		fmt.Fprint(w, "Script çalıştı ama 'response' değişkeni tanımlanmadı.")
 		return
 	}
@@ -114,7 +113,7 @@ func sendResponse(w http.ResponseWriter, env *object.Environment) {
 		// Body
 		bodyKey := &object.String{Value: "body"}
 		if pair, ok := hash.Pairs[bodyKey.HashKey()]; ok {
-			// Eğer body string ise tırnakları temizle, değilse inspect et
+			// Eğer body string ise tırnakları temizle
 			if strVal, ok := pair.Value.(*object.String); ok {
 				fmt.Fprint(w, strVal.Value)
 			} else {
@@ -127,7 +126,7 @@ func sendResponse(w http.ResponseWriter, env *object.Environment) {
 	}
 }
 
-// Yardımcı: Hash map'e string eklemek için
+// addToHash: Hash map'e string eklemek için yardımcı fonksiyon
 func addToHash(m map[object.HashKey]object.HashPair, key string, val string) {
 	k := &object.String{Value: key}
 	v := &object.String{Value: val}

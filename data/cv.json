@@ -1,0 +1,108 @@
+{
+    "kisisel": {
+        "ad": "Süleyman MERCAN",
+        "unvan": "Backend Developer",
+        "telefon": "+90 551 952 45 00",
+        "email": "slymanmrcan@gmail.com",
+        "github": "github.com/slymanmrcan",
+        "linkedin": "linkedin.com/in/slymanmrcan",
+        "konum": "Türkiye",
+        "ozet": "REST API, veri erişimi ve kurumsal backend mimarileri üzerinde çalışan bir geliştiriciyim. .NET Core ekosistemine odaklanıyor; temiz kod, katmanlı yapı ve performans odaklı API geliştirme alanlarında kendimi geliştirmeye devam ediyorum. Ayrıca Go ile kendi programlama dilimi (HajiLang) geliştiriyorum."
+    },
+    "yetenekler": [
+        {
+            "kategori": "Backend",
+            "items": [".NET Core", "ASP.NET", "REST API", "Go", "HajiLang"]
+        },
+        {
+            "kategori": "ORM & Data",
+            "items": ["EF Core", "LINQ", "Dapper"]
+        },
+        {
+            "kategori": "Database",
+            "items": ["SQL Server", "PostgreSQL"]
+        },
+        {
+            "kategori": "DevOps",
+            "items": ["Git", "GitHub Actions", "CI/CD", "Docker"]
+        },
+        {
+            "kategori": "Prensipler",
+            "items": ["SOLID", "Clean Architecture", "Katmanlı Mimari"]
+        },
+        {
+            "kategori": "Dil Tasarımı",
+            "items": ["Lexer", "Parser", "AST", "Interpreter"]
+        }
+    ],
+    "projeler": [
+        {
+            "ad": "🔥 HajiLang",
+            "aciklama": "Go ile sıfırdan yazdığım programlama dili. Lexer, Parser, AST ve Evaluator içerir. HTTP server desteği var. Bu CV bile HajiLang ile host ediliyor!",
+            "teknolojiler": ["Go", "Lexer", "Parser", "AST", "HTTP Server"],
+            "link": "github.com/slymanmrcan/hajilang",
+            "onemli": true
+        },
+        {
+            "ad": "eduCenter",
+            "aciklama": "Kurum içi öğrenci, ders, ödeme ve sınav yönetimi için geliştirilen backend sistemi. Çok katmanlı mimari, EF Core ile ilişkisel veri modeli, rol-yetki tabanlı erişim.",
+            "teknolojiler": [".NET Core", "EF Core", "SQL Server", "Clean Architecture"],
+            "link": "",
+            "onemli": true
+        },
+        {
+            "ad": "BaseLibrary",
+            "aciklama": "Yeni projelerde ortak altyapıyı standartlaştırmak için geliştirilen yeniden kullanılabilir çekirdek kütüphane. Generic repository, unit of work, exception middleware.",
+            "teknolojiler": [".NET Core", "Generic Repository", "Unit of Work"],
+            "link": "github.com/slymanmrcan",
+            "onemli": false
+        },
+        {
+            "ad": "TaskScheduler.API",
+            "aciklama": "Zamanlanmış görevler ve tetikleyici işlemler için hafif API servisi. Minimal API + servis tabanlı yapı.",
+            "teknolojiler": [".NET Core", "Minimal API", "PostgreSQL"],
+            "link": "",
+            "onemli": false
+        },
+        {
+            "ad": "Diğer Projeler",
+            "aciklama": "DeviceInfo, KasaTakip, github-infra, PrivFlow — GitHub üzerinden erişilebilir.",
+            "teknolojiler": ["Çeşitli"],
+            "link": "github.com/slymanmrcan",
+            "onemli": false
+        }
+    ],
+    "deneyim": [
+        {
+            "pozisyon": "Yazılım Geliştirici",
+            "sirket": "Logiting Teknoloji - Konya",
+            "tarih": "09/2021 - 05/2022",
+            "detaylar": [
+                "Backend geliştirme ve API tasarımı",
+                "Veri modeli oluşturma",
+                "Yazılım süreçlerinin iyileştirilmesi"
+            ]
+        },
+        {
+            "pozisyon": "Stajyer",
+            "sirket": "Karayolları Genel Müdürlüğü",
+            "tarih": "01/2019 - 02/2019",
+            "detaylar": [
+                "Network altyapısı",
+                "Donanım destek süreçleri"
+            ]
+        }
+    ],
+    "egitim": [
+        {
+            "okul": "Necmettin Erbakan Üniversitesi",
+            "bolum": "Matematik Bilgisayar Bilimleri",
+            "tarih": "2018 - 2021"
+        },
+        {
+            "okul": "Konya Teknik Üniversitesi",
+            "bolum": "Bilgisayar Programcılığı",
+            "tarih": "2015 - 2018"
+        }
+    ]
+}

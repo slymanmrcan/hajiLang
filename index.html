@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV | HajiLang ile Host Ediliyor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 50px 30px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #4a2c7a 100%);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,255,136,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00ff88, #00ccff, #ff00ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+            100% { background-position: 0% center; }
+        }
+
+        .header .title {
+            font-size: 1.3em;
+            color: #b0b0b0;
+            margin-bottom: 25px;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .contact-links a {
+            color: #00ccff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #00ccff;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .contact-links a:hover {
+            background: #00ccff;
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 204, 255, 0.3);
+        }
+
+        .powered-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        /* Sections */
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: #00ff88;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* About */
+        .about-text {
+            font-size: 1.1em;
+            color: #c0c0c0;
+        }
+
+        /* Skills */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(102, 0, 255, 0.1) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #00ccff;
+        }
+
+        .skill-card h4 {
+            color: #00ccff;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        /* Projects */
+        .project-card {
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.5) 0%, rgba(74, 44, 122, 0.5) 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            border-color: #00ff88;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);
+        }
+
+        .project-card.featured {
+            border-left: 4px solid #00ff88;
+        }
+
+        .project-card h3 {
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-card h3 .star {
+            color: #ffd700;
+        }
+
+        .project-card p {
+            color: #a0a0a0;
+            margin-bottom: 15px;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tech-tag {
+            background: rgba(0, 204, 255, 0.2);
+            color: #00ccff;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        /* Timeline */
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 25px;
+            border-left: 2px solid #00ff88;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 5px;
+            width: 14px;
+            height: 14px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .timeline-item h3 {
+            color: #fff;
+            font-size: 1.15em;
+        }
+
+        .timeline-item .subtitle {
+            color: #00ccff;
+            font-size: 1em;
+        }
+
+        .timeline-item .date {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .timeline-item ul {
+            color: #a0a0a0;
+            padding-left: 20px;
+        }
+
+        .timeline-item li {
+            margin-bottom: 5px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #555;
+        }
+
+        .footer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 15px 30px;
+            border-radius: 30px;
+            color: #00ff88;
+            font-size: 1em;
+        }
+
+        .footer-badge strong {
+            color: #fff;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 100px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 255, 136, 0.1);
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 2em; }
+            .contact-links { flex-direction: column; align-items: center; }
+            .section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p style="color: #00ff88;">CV Yükleniyor...</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadCV() {
+            try {
+                const response = await fetch('/api/cv');
+                const cv = await response.json();
+                renderCV(cv);
+            } catch (error) {
+                document.getElementById('app').innerHTML = `
+                    <div class="section" style="text-align: center;">
+                        <h2 style="color: #ff6b6b;">❌ Hata</h2>
+                        <p>CV yüklenirken hata oluştu: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderCV(cv) {
+            const html = `
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-content">
+                        <h1>${cv.kisisel.ad}</h1>
+                        <div class="title">${cv.kisisel.unvan}</div>
+                        <div class="contact-links">
+                            <a href="mailto:${cv.kisisel.email}">📧 Email</a>
+                            <a href="https://${cv.kisisel.github}" target="_blank">🐙 GitHub</a>
+                            <a href="https://${cv.kisisel.linkedin}" target="_blank">💼 LinkedIn</a>
+                            <a href="#">📍 ${cv.kisisel.konum}</a>
+                        </div>
+                        <div class="powered-badge">⚡ HajiLang ile Host Ediliyor</div>
+                    </div>
+                </div>
+
+                <!-- About -->
+                <div class="section">
+                    <h2>👤 Hakkımda</h2>
+                    <p class="about-text">${cv.kisisel.ozet}</p>
+                </div>
+
+                <!-- Skills -->
+                <div class="section">
+                    <h2>🛠️ Yetenekler</h2>
+                    <div class="skills-grid">
+                        ${cv.yetenekler.map(skill => `
+                            <div class="skill-card">
+                                <h4>${skill.kategori}</h4>
+                                <div class="skill-tags">
+                                    ${skill.items.map(item => `<span class="skill-tag">${item}</span>`).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Projects -->
+                <div class="section">
+                    <h2>💻 Projeler</h2>
+                    ${cv.projeler.map(proje => `
+                        <div class="project-card ${proje.onemli ? 'featured' : ''}">
+                            <h3>
+                                ${proje.onemli ? '<span class="star">⭐</span>' : ''}
+                                ${proje.ad}
+                            </h3>
+                            <p>${proje.aciklama}</p>
+                            <div class="tech-tags">
+                                ${proje.teknolojiler.map(t => `<span class="tech-tag">${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- Experience -->
+                <div class="section">
+                    <h2>💼 Deneyim</h2>
+                    ${cv.deneyim.map(exp => `
+                        <div class="timeline-item">
+                            <h3>${exp.pozisyon}</h3>
+                            <div class="subtitle">${exp.sirket}</div>
+                            <div class="date">📅 ${exp.tarih}</div>
+                            <ul>
+                                ${exp.detaylar.map(d => `<li>${d}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- Education -->
+                <div class="section">
+                    <h2>🎓 Eğitim</h2>
+                    ${cv.egitim.map(edu => `
+                        <div class="timeline-item">
+                            <h3>${edu.bolum}</h3>
+                            <div class="subtitle">${edu.okul}</div>
+                            <div class="date">📅 ${edu.tarih}</div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- Footer -->
+                <div class="footer">
+                    <div class="footer-badge">
+                        ⚡ Powered by <strong>HajiLang</strong> - Go ile yazılmış programlama dili
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('app').innerHTML = html;
+        }
+
+        // Sayfa yüklendiğinde CV'yi getir
+        loadCV();
+    </script>
+</body>
+</html>
