@@ -8,6 +8,6 @@ if (path == "/") {
 }
 
 if (path == "/api/cv") {
-    let data = json_read("data/cv.json")
+    let data = json_read("data/file.json")
     let response = {"status": 200, "body": data}
 }

@@ -1,7 +1,0 @@
-puts("merhab");
-puts(12);
-if(10>12){
-    puts("olmadı");
-}else{
-    puts("geçtiniz"+ "" + "12");
-}
