@@ -4,14 +4,14 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:  # Manuel tetikleme için
+      - "v*"
+  workflow_dispatch: # Manuel tetikleme için
 
 jobs:
   build:
     name: Build HajiLang
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         # Çoklu platform build
@@ -26,26 +26,26 @@ jobs:
             goarch: arm64
           - goos: windows
             goarch: amd64
-    
+
     steps:
       # 1. Kodu çek
       - name: Checkout code
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@v6
+
       # 2. Go'yu kur
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.21'
-      
+          go-version: "1.25"
+
       # 3. Bağımlılıkları indir
       - name: Get dependencies
         run: go mod download
-      
+
       # 4. dist klasörü oluştur
       - name: Create dist directory
         run: mkdir -p dist
-      
+
       # 5. Build al
       - name: Build
         env:
@@ -58,10 +58,10 @@ jobs:
             OUTPUT_NAME="${OUTPUT_NAME}.exe"
           fi
           go build -ldflags="-s -w -X main.Version=${{ github.ref_name }}" -o dist/$OUTPUT_NAME main.go
-          
+
           # Binary boyutunu göster
           ls -lh dist/$OUTPUT_NAME
-      
+
       # 6. Binary'yi artifact olarak kaydet
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -73,12 +73,12 @@ jobs:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
-    
+
     steps:
       # 1. Kodu çek
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       # 2. Tüm artifact'leri indir
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -86,7 +86,7 @@ jobs:
           path: ./dist
           pattern: hajilang-*
           merge-multiple: true
-      
+
       # 3. Release oluştur veya güncelle
       - name: Create or Update Release
         id: create_release
@@ -98,7 +98,7 @@ jobs:
           name: HajiLang ${{ github.ref_name || 'v1.0.0' }}
           body: |
             ## HajiLang Release ${{ github.ref_name || 'v1.0.0' }}
-            
+
             ### 🚀 Yeni Özellikler
             - ✅ **Fonksiyonlar:** `fn(x) { return x * x }` ve closure desteği
             - ✅ **Döngüler:** `for` döngüsü desteği
@@ -106,35 +106,35 @@ jobs:
             - ✅ **Operatörler:** Modulo (`%`), Mantıksal (`&&`, `||`), Karşılaştırma (`<=`, `>=`)
             - ✅ **REPL:** Geçmiş (history) desteği ve gelişmiş satır düzenleme
             - ✅ **Bug Fixes:** Parser ve Evaluator iyileştirmeleri
-            
+
             ### 📦 Mevcut Özellikler
             - Integer, String, Boolean tipleri
             - If-Else koşulları
             - Array ve Hash yapıları
             - Builtin fonksiyonlar (`yaz`, `len`, `push` vb.)
-            
+
             ### Kullanım
             ```bash
             # Linux/macOS
             chmod +x hajilang-linux-amd64
             ./hajilang-linux-amd64 test.haji
-            
+
             # Windows
             hajilang-windows-amd64.exe test.haji
             ```
-            
+
             ### Örnek Kod
             ```javascript
             // Fonksiyon
             haji topla = fn(a, b) {
                 return a + b
             }
-            
+
             // Döngü
             for (haji i = 0; i < 5; i = i + 1) {
                 yaz("Sayı:", i)
             }
-            
+
             // Mantıksal Kontrol
             if (5 > 3 && 2 <= 2) {
                 yaz("Başarılı!")
