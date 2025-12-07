@@ -5,6 +5,7 @@ type TokenType string
 type Token struct {
 	Type    TokenType
 	Literal string
+	Line    int // Satır numarası
 }
 
 const (
@@ -15,6 +16,7 @@ const (
 	IDENT  = "IDENT"
 	INT    = "INT"
 	STRING = "STRING"
+	FLOAT  = "FLOAT"
 
 	// Operatörler
 	ASSIGN   = "="
@@ -23,12 +25,17 @@ const (
 	BANG     = "!"
 	ASTERISK = "*"
 	SLASH    = "/"
+	PERCENT  = "%"
 
 	LT = "<"
 	GT = ">"
 
 	EQ     = "=="
 	NOT_EQ = "!="
+	LT_EQ  = "<="
+	GT_EQ  = ">="
+	AND    = "&&"
+	OR     = "||"
 	COLON  = ":"
 
 	// Ayıraçlar
@@ -40,16 +47,19 @@ const (
 	RBRACE    = "}"
 
 	LBRACKET = "[" //
-	RBRACKET = "]" // 
+	RBRACKET = "]" //
 
 	// Keywordler
 	FUNCTION = "FUNCTION"
+	HAJI     = "HAJI"
+	KATI     = "KATI"
 	LET      = "LET"
 	TRUE     = "TRUE"
 	FALSE    = "FALSE"
 	IF       = "IF"
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
+	FOR      = "FOR"
 )
 
 var keywords = map[string]TokenType{
@@ -60,6 +70,9 @@ var keywords = map[string]TokenType{
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,
+	"haji":   HAJI,
+	"kati":   KATI,
+	"for":    FOR,
 }
 
 func LookupIdent(ident string) TokenType {

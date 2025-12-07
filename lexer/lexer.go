@@ -7,10 +7,11 @@ type Lexer struct {
 	position     int
 	readPosition int
 	ch           byte
+	line         int // Satır numarası
 }
 
 func New(input string) *Lexer {
-	l := &Lexer{input: input}
+	l := &Lexer{input: input, line: 1}
 	l.readChar()
 	return l
 }
@@ -96,10 +97,40 @@ func (l *Lexer) NextToken() token.Token {
 		}
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
+	case '%':
+		tok = newToken(token.PERCENT, l.ch)
 	case '<':
-		tok = newToken(token.LT, l.ch)
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token.Token{Type: token.LT_EQ, Literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(token.LT, l.ch)
+		}
 	case '>':
-		tok = newToken(token.GT, l.ch)
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token.Token{Type: token.GT_EQ, Literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(token.GT, l.ch)
+		}
+	case '&':
+		if l.peekChar() == '&' {
+			ch := l.ch
+			l.readChar()
+			tok = token.Token{Type: token.AND, Literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(token.ILLEGAL, l.ch)
+		}
+	case '|':
+		if l.peekChar() == '|' {
+			ch := l.ch
+			l.readChar()
+			tok = token.Token{Type: token.OR, Literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(token.ILLEGAL, l.ch)
+		}
 	case '{':
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
@@ -114,16 +145,27 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
 		} else if isDigit(l.ch) {
-			tok.Type = token.INT
-			tok.Literal = l.readNumber()
+			numStr, isFloat := l.readNumber()
+			if isFloat {
+				tok.Type = token.FLOAT
+				tok.Literal = numStr
+			} else {
+				tok.Type = token.INT
+				tok.Literal = numStr
+			}
 			return tok
 		} else {
 			tok = newToken(token.ILLEGAL, l.ch)
 		}
 	}
 
+	tok.Line = l.line
 	l.readChar()
 	return tok
+}
+
+func (l *Lexer) newTokenWithLine(tokenType token.TokenType, ch byte) token.Token {
+	return token.Token{Type: tokenType, Literal: string(ch), Line: l.line}
 }
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
@@ -157,16 +199,32 @@ func (l *Lexer) readString() string {
 	}
 	return l.input[position:l.position]
 }
-func (l *Lexer) readNumber() string {
+func (l *Lexer) readNumber() (string, bool) {
 	position := l.position
+	isFloat := false
+
 	for isDigit(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+
+	// Eğer nokta görürsek ve sonrası rakamsa, bu float'tır
+	if l.ch == '.' && isDigit(l.peekChar()) {
+		isFloat = true
+		l.readChar() // '.' geç
+
+		for isDigit(l.ch) {
+			l.readChar()
+		}
+	}
+
+	return l.input[position:l.position], isFloat
 }
 
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		if l.ch == '\n' {
+			l.line++
+		}
 		l.readChar()
 	}
 }

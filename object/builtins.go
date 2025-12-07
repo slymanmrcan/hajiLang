@@ -44,6 +44,22 @@ var Builtins = map[string]*Builtin{
 		},
 	},
 
+	// yaz(değer) -> puts'ın Türkçe alias'ı
+	"yaz": &Builtin{
+		Fn: func(args ...Object) Object {
+			for _, arg := range args {
+				if str, ok := arg.(*String); ok {
+					fmt.Print(str.Value)
+				} else {
+					fmt.Print(arg.Inspect())
+				}
+				fmt.Print(" ")
+			}
+			fmt.Println()
+			return NULL
+		},
+	},
+
 	// --- DİZİ (ARRAY) İŞLEMLERİ ---
 
 	// first(dizi) -> İlk elemanı döner

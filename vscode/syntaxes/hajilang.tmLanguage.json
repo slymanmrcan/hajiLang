@@ -1,0 +1,67 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "HajiLang",
+    "patterns": [
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#functions"
+        },
+        {
+            "include": "#numbers"
+        },
+        {
+            "include": "#operators"
+        }
+    ],
+    "repository": {
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.control.haji",
+                    "match": "\\b(if|else|return|fn|for|haji|kati)\\b"
+                },
+                {
+                    "name": "constant.language.haji",
+                    "match": "\\b(true|false)\\b"
+                }
+            ]
+        },
+        "strings": {
+            "name": "string.quoted.double.haji",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": [
+                {
+                    "name": "constant.character.escape.haji",
+                    "match": "\\\\."
+                }
+            ]
+        },
+        "comments": {
+            "name": "comment.line.double-slash.haji",
+            "begin": "//",
+            "end": "$"
+        },
+        "functions": {
+            "name": "support.function.haji",
+            "match": "\\b(yaz|len|first|last|rest|push|puts)\\b"
+        },
+        "numbers": {
+            "name": "constant.numeric.haji",
+            "match": "\\b\\d+\\b"
+        },
+        "operators": {
+            "name": "keyword.operator.haji",
+            "match": "\\+|\\-|\\*|/|%|==|!=|<|<=|>|>=|=|!"
+        }
+    },
+    "scopeName": "source.haji"
+}

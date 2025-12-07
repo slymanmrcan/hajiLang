@@ -967,37 +967,204 @@ func Eval(node ast.Node) {
 
 ---
 🎓 Özet
-5 Katman Hızlı Özet:
 
-Token: Dilin kelime dağarcığı (LET, INT, PLUS, STRING...)
-Lexer: Metni token'lara ayırır ("let x = 5" → [LET, IDENT, ASSIGN, INT])
-AST: Token'ları ağaç yapısına dönüştürür (anlamlı hiyerarşi)
-Parser: Token'ları okuyup AST ağacını oluşturur (fonksiyon map sistemi ile)
-Evaluator: AST'yi dolaşıp hesaplamaları yapar ve sonuç üretir
-Object: Çalışma zamanında bellekte tutulan değerler (Integer, String, Boolean...)
-Environment: Değişkenlerin saklandığı hafıza (key-value store)
+## 5 Katman Hızlı Özet:
 
-Yeni Özellik Eklerken Sıra:
-1. TOKEN     → Yeni token tipi ekle (ör: LBRACKET)
-2. LEXER     → Token'ı tanı ve üret (ör: '[' karakterini yakala)
-3. AST       → Yeni node yapısı ekle (ör: ArrayLiteral struct)
-4. PARSER    → Parse fonksiyonu yaz ve map'e kaydet
-5. OBJECT    → Çalışma zamanı tipi ekle (ör: Array object)
-6. EVALUATOR → Değerlendirme loğiğini yaz (ör: diziyi hesapla)
-En Önemli Kavramlar:
-Pratt Parsing: Parser'ın fonksiyon map sistemi sayesinde genişletilebilir olması
+| Katman | Dosya | Görevi |
+|--------|-------|--------|
+| **Token** | `token/token.go` | Dilin kelime dağarcığı (LET, INT, PLUS, FUNCTION...) |
+| **Lexer** | `lexer/lexer.go` | Metni token'lara ayırır |
+| **AST** | `ast/` | Token'ları ağaç yapısına dönüştürür |
+| **Parser** | `parser/` | Token'ları okuyup AST ağacını oluşturur |
+| **Evaluator** | `evaluator/` | AST'yi dolaşıp hesaplamaları yapar |
+| **Object** | `object/` | Çalışma zamanında değerler (Integer, String, Function...) |
 
-prefixParseFns: Token başında ne yapılacak? (sayı, string, değişken...)
-infixParseFns: İki değer arasında ne yapılacak? (+, -, *, ==...)
+---
 
-Type Switch: Go'da node tipine göre farklı işlem yapma
-goswitch node := node.(type) {
-case *ast.IntegerLiteral:
-    // Integer işle
-case *ast.StringLiteral:
-    // String işle
+## 🆕 Son Eklenen Özellikler
+
+### 1. Türkçe Keyword'ler
+
+| Keyword | İngilizce | Kullanım |
+|---------|-----------|----------|
+| `haji` | `let` | Değişken tanımlama |
+| `kati` | `const` | Sabit tanımlama |
+
+```javascript
+haji x = 5      // Değiştirilebilir
+kati PI = 3.14  // Değiştirilemez
+```
+
+### 2. Fonksiyonlar (`fn`)
+
+**Dosyalar:**
+- `parser/functions.go` - `parseFunctionLiteral`, `parseFunctionParameters`
+- `evaluator/functions.go` - `evalFunctionLiteral`, `applyFunction`, `extendFunctionEnv`
+- `object/functions.go` - `Function` struct
+
+**Syntax:**
+```javascript
+haji topla = fn(a, b) {
+    return a + b
 }
-Environment: Değişken hafızası, scope yönetimi için kullanılır
+yaz(topla(3, 5))  // 8
+```
+
+**Closure Desteği:**
+```javascript
+haji carpici = fn(x) {
+    return fn(y) {
+        return x * y
+    }
+}
+
+haji ikiKati = carpici(2)
+yaz(ikiKati(5))  // 10
+```
+
+**Akış:**
+```
+fn(x, y) { return x + y; }
+         ↓
+[1] Parser: parseFunctionLiteral()
+         ↓
+[2] AST: FunctionLiteral { Parameters, Body }
+         ↓
+[3] Evaluator: evalFunctionLiteral() 
+         ↓
+[4] Object: Function { Parameters, Body, Env }
+```
+
+### 3. For Döngüsü
+
+**Dosyalar:**
+- `parser/controls.go` - `parseForStatement`
+- `evaluator/conditionals.go` - `evalForStatement`
+- `ast/statements.go` - `ForStatement`
+
+**Syntax:**
+```javascript
+for (haji i = 0; i < 5; i = i + 1) {
+    yaz(i)
+}
+```
+
+**Enclosed Environment:**
+For döngüsü kendi scope'unu oluşturur. `NewEnclosedEnvironment(env)` ile dış değişkenlere erişim sağlanır.
+
+```go
+func evalForStatement(node *ast.ForStatement, env *object.Environment) object.Object {
+    forEnv := object.NewEnclosedEnvironment(env)  // ← Yeni scope
+    
+    if node.Init != nil {
+        Eval(node.Init, forEnv)
+    }
+    
+    for {
+        condition := Eval(node.Condition, forEnv)
+        if !isTruthy(condition) {
+            break
+        }
+        Eval(node.Body, forEnv)
+        Eval(node.Post, forEnv)
+    }
+    
+    return object.NULL
+}
+```
+
+### 4. Scope Chaining (Environment)
+
+**Dosya:** `object/environment.go`
+
+```go
+type Environment struct {
+    store     map[string]Object
+    immutable map[string]bool
+    outer     *Environment  // ← Dış scope referansı
+}
+
+// Get - Önce bu scope'ta, sonra dış scope'ta ara
+func (e *Environment) Get(name string) (Object, bool) {
+    obj, ok := e.store[name]
+    if !ok && e.outer != nil {
+        obj, ok = e.outer.Get(name)  // ← Recursive arama
+    }
+    return obj, ok
+}
+
+// Set - Dış scope'taki değişkeni güncelle
+func (e *Environment) Set(name string, val Object) Object {
+    if _, ok := e.store[name]; ok {
+        e.store[name] = val
+        return val
+    }
+    if e.outer != nil {
+        if _, ok := e.outer.Get(name); ok {
+            return e.outer.Set(name, val)  // ← Dış scope'ta güncelle
+        }
+    }
+    e.store[name] = val
+    return val
+}
+```
+
+---
+
+## 📁 Modüler Klasör Yapısı
+
+```
+hajiLang/
+├── token/          # Token tanımları
+│   └── token.go
+├── lexer/          # Lexer (tokenizer)
+│   └── lexer.go
+├── ast/            # AST node'ları
+│   ├── ast.go
+│   ├── expressions.go   # Identifier, InfixExpression, FunctionLiteral...
+│   ├── statements.go    # LetStatement, ForStatement, ReturnStatement...
+│   └── literals.go      # IntegerLiteral, StringLiteral, ArrayLiteral...
+├── parser/         # Parser
+│   ├── parser.go        # Ana parser, precedence, register
+│   ├── statements.go    # parseStatement, parseLetStatement...
+│   ├── expressions.go   # parseExpression, parsePrefixExpression...
+│   ├── controls.go      # parseIfExpression, parseForStatement, parseBlockStatement
+│   ├── functions.go     # parseFunctionLiteral, parseCallExpression
+│   ├── collections.go   # parseArrayLiteral, parseHashLiteral
+│   └── helpers.go       # expectPeek, peekError, registerPrefix...
+├── evaluator/      # Evaluator
+│   ├── evaluator.go     # Ana Eval switch
+│   ├── expressions.go   # evalInfixExpression, evalPrefixExpression...
+│   ├── statements.go    # evalLetStatement, evalReturnStatement...
+│   ├── conditionals.go  # evalIfExpression, evalForStatement
+│   ├── functions.go     # evalFunctionLiteral, applyFunction, extendFunctionEnv
+│   ├── literals.go      # evalIntegerLiteral, evalStringLiteral...
+│   └── helpers.go       # newError, isError, isTruthy...
+├── object/         # Runtime objects
+│   ├── object.go        # Object interface, ObjectType
+│   ├── primitives.go    # Integer, String, Boolean, Null
+│   ├── functions.go     # Function, Builtin, ReturnValue
+│   ├── collections.go   # Array, Hash
+│   ├── environment.go   # Environment, scope chaining
+│   └── builtins.go      # puts, yaz, len, first, last, push...
+├── repl/           # Interactive shell
+│   └── repl.go
+├── runtime/        # HTTP runtime (opsiyonel)
+└── main.go         # Entry point
+```
+
+---
+
+## 🔧 Yeni Özellik Ekleme Sırası
+
+1. **TOKEN** → `token/token.go` - Yeni token tipi ekle
+2. **LEXER** → `lexer/lexer.go` - Token'ı tanı ve üret
+3. **AST** → `ast/` - Yeni node yapısı ekle
+4. **PARSER** → `parser/` - Parse fonksiyonu yaz, `registerPrefix/registerInfix`
+5. **OBJECT** → `object/` - Çalışma zamanı tipi ekle
+6. **EVALUATOR** → `evaluator/` - Değerlendirme loğiğini yaz
+
+
 
 🏁 EOF (End of File) - Token Bitirme Sistemi
 EOF Nedir?

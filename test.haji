@@ -1,10 +1,88 @@
-let x = 5;
-let y = 10;
-let name = "öğrenci";
-let sonuc = x + y;
+// ==========================================
+// 🚀 HAJILANG ÖZELLİK VİTRİNİ (SHOWCASE)
+// ==========================================
 
-if (sonuc > 12) {
-    name + " " +"geçti";
-} else {
-    "Küçük";
+// 1. Değişkenler ve Sabitler
+// ------------------------------------------
+kati SURUM = "v1.0"
+haji yazar = "Süleyman"
+yaz("=== HajiLang " + SURUM + " Başlatıldı ===")
+yaz("Geliştirici: " + yazar)
+yaz("-------------------------------------")
+
+// 2. Recursive (Özyinelemeli) Fonksiyonlar
+// ------------------------------------------
+haji fibonacci = fn(x) {
+    if (x == 0) {
+        return 0
+    }
+    if (x == 1) {
+        return 1
+    }
+    return fibonacci(x - 1) + fibonacci(x - 2)
 }
+
+yaz(">> Fibonacci(10) Hesaplanıyor...")
+yaz("Sonuç:", fibonacci(10)) // 55
+
+// 3. Higher-Order Functions (Fonksiyon Döndüren Fonksiyonlar)
+// ------------------------------------------
+haji carpiciYap = fn(kat) {
+    return fn(x) {
+        return x * kat
+    }
+}
+
+haji ikiyleCarp = carpiciYap(2)
+haji ucleCarp = carpiciYap(3)
+
+yaz("-------------------------------------")
+yaz("5 * 2 =", ikiyleCarp(5))
+yaz("5 * 3 =", ucleCarp(5))
+
+// 4. Diziler ve Kendi 'Map' Fonksiyonumuz
+// ------------------------------------------
+haji map = fn(arr, f) {
+    haji iter = fn(arr, birikim) {
+        if (len(arr) == 0) {
+            return birikim
+        }
+        haji bas = first(arr)
+        haji kuyruk = rest(arr)
+        haji yeniBirikim = push(birikim, f(bas))
+        return iter(kuyruk, yeniBirikim)
+    }
+    return iter(arr, [])
+}
+
+haji sayilar = [1, 2, 3, 4]
+haji kareler = map(sayilar, fn(x) { return x * x })
+
+yaz("-------------------------------------")
+yaz("Dizi:   ", sayilar)
+yaz("Kareler:", kareler)
+
+// 5. For Döngüsü ve Karmaşık Mantık (FizzBuzz)
+// ------------------------------------------
+yaz("-------------------------------------")
+yaz(">> FizzBuzz Testi (1-15)")
+
+for (haji i = 1; i <= 15; i = i + 1) {
+    haji cikti = ""
+    
+    if (i % 3 == 0) {
+        cikti = cikti + "Fizz"
+    }
+    if (i % 5 == 0) {
+        cikti = cikti + "Buzz"
+    }
+    
+    if (cikti == "") {
+        yaz(i)
+    } else {
+        yaz(i, "->", cikti)
+    }
+}
+
+yaz("-------------------------------------")
+yaz("✅ Showcase Tamamlandı!")

@@ -1,0 +1,35 @@
+{
+    "name": "hajilang",
+    "displayName": "HajiLang",
+    "description": "Language support for HajiLang",
+    "version": "0.1.0",
+    "publisher": "slymanmrcan",
+    "engines": {
+        "vscode": "^1.74.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "hajilang",
+                "aliases": [
+                    "HajiLang",
+                    "haji"
+                ],
+                "extensions": [
+                    ".haji"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "hajilang",
+                "scopeName": "source.haji",
+                "path": "./syntaxes/hajilang.tmLanguage.json"
+            }
+        ]
+    }
+}

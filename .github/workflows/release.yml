@@ -99,13 +99,19 @@ jobs:
           body: |
             ## HajiLang Release ${{ github.ref_name || 'v1.0.0' }}
             
-            ### Özellikler
-            - ✅ Integer, Boolean, String desteği
-            - ✅ If-Else koşulları
-            - ✅ Değişken tanımlama (let)
-            - ✅ Aritmetik operatörler (+, -, *, /)
-            - ✅ Karşılaştırma operatörleri (<, >, ==, !=)
-            - ✅ Yorum satırları (//)
+            ### 🚀 Yeni Özellikler
+            - ✅ **Fonksiyonlar:** `fn(x) { return x * x }` ve closure desteği
+            - ✅ **Döngüler:** `for` döngüsü desteği
+            - ✅ **Değişkenler:** `haji` (değişken) ve `kati` (sabit) tanımları
+            - ✅ **Operatörler:** Modulo (`%`), Mantıksal (`&&`, `||`), Karşılaştırma (`<=`, `>=`)
+            - ✅ **REPL:** Geçmiş (history) desteği ve gelişmiş satır düzenleme
+            - ✅ **Bug Fixes:** Parser ve Evaluator iyileştirmeleri
+            
+            ### 📦 Mevcut Özellikler
+            - Integer, String, Boolean tipleri
+            - If-Else koşulları
+            - Array ve Hash yapıları
+            - Builtin fonksiyonlar (`yaz`, `len`, `push` vb.)
             
             ### Kullanım
             ```bash
@@ -118,14 +124,20 @@ jobs:
             ```
             
             ### Örnek Kod
-            ```
-            let x = 10;
-            let y = 20;
+            ```javascript
+            // Fonksiyon
+            haji topla = fn(a, b) {
+                return a + b
+            }
             
-            if (x < y) {
-                "x küçük";
-            } else {
-                "x büyük";
+            // Döngü
+            for (haji i = 0; i < 5; i = i + 1) {
+                yaz("Sayı:", i)
+            }
+            
+            // Mantıksal Kontrol
+            if (5 > 3 && 2 <= 2) {
+                yaz("Başarılı!")
             }
             ```
           draft: false
